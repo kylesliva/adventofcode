@@ -34,9 +34,7 @@ def main():
 def readMass(path):
     masses = []
     with open(path, 'r') as file:
-        for line in file:
-            logging.debug(line)
-            masses.append(int(line))
+        masses = file.readlines()
     logging.debug(f"**** MASSES ****\n{p.pformat(masses)}")
 
     return masses
