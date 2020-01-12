@@ -5,7 +5,7 @@ import sys
 import pytest
 
 #enable logging
-#logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s- %(message)s')
+logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s- %(message)s')
 #logging.basicConfig(level=logging.INFO, format=' %(asctime)s - %(levelname)s- %(message)s')
 
 def main():
@@ -14,23 +14,23 @@ def main():
     print(runCode(programs))
 
 
-# reads input file and returns string(s) of programs
+
+# reads input file and returns list(s) of ints
 def readFile(path):
-    program = []
+    programs = []
+
+    results = []
+    
     with open(path, 'r') as file:
-        program_string = file.readlines()
-        logging.debug(program_string)
-        program = program_string
-        logging.debug(program)
+        programs_string = file.readlines()
+        logging.debug(programs_string)
+        programs = programs_string
+        logging.debug(programs)
 
     # remove errant newline chars
-    program = [line.rstrip('\n') for line in program]
+    programs = [line.rstrip('\n') for line in programs]
 
-    return program
-
-# goes through all program strings
-def runCode(programs):
-    outputs = []
+    # converts all lists to lists of ints
     for program in programs:
         logging.debug(f"program: {program}")
 
@@ -40,10 +40,36 @@ def runCode(programs):
         #casts each char as int
         program = [int(stringInt) for stringInt in program]
         logging.debug(f"split program: {program}")
-        logging.info(f"\nold: {program}\n"
-                        f"new: {processIntcode(program)}"
-                        )
+        results.append(program)
+
+    logging.info(type(results[0]))
+    if path == "input.txt":
+        logging.info("main input detected")
+        logging.debug(results[0])
+        results[0] = changeVerbs(12, 2, results[0])
+
+    return results
+
+def changeVerbs(noun, verb, program):
+    program[1] = noun
+    program[2] = verb 
+
+    return program
+
+# runs intcode machine until desired result is found
+def findOutput(noun, verb, program):
+    program[1] = noun
+    program[2] = verb 
+
+    return (noun, verb)
+    
+# goes through all program strings
+def runCode(programs):
+    outputs = []
+    for program in programs:
+        processIntcode(program)
         outputs.append(program)
+
     return outputs
 
 # processes intcode        
@@ -51,7 +77,7 @@ def processIntcode(program):
     #initialize as first char
     position = 0 
 
-    logging.debug("processing intcode...")
+    print("processing intcode...")
     while program[position] != 99:
         opcode = program[position]
         pos1 = program[position + 1]
@@ -79,6 +105,7 @@ def processIntcode(program):
     return program
     
 # see how hard it is to put test cases in another file
+# tests intcode compiler
 def testIntcode():
     programs = readFile('test-strings.txt')
 
