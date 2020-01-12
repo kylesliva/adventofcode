@@ -5,7 +5,8 @@ import sys
 import pytest
 
 #enable logging
-logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s- %(message)s')
+#logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s- %(message)s')
+logging.basicConfig(level=logging.INFO, format=' %(asctime)s - %(levelname)s- %(message)s')
 
 def main():
     programs = readFile(sys.argv[1])
@@ -28,30 +29,48 @@ def readFile(path):
 
 # goes through all program strings
 def runCode(programs):
-    num = -1
-    index = 0
     for program in programs:
         logging.debug(f"program: {program}")
         program = program.split(',')
+        #yeah these need to be ints
+        program = [int(stringInt) for stringInt in program]
         logging.debug(f"split program: {program}")
-        # need to enumerate
-        for i, code in enumerate(program):
-            logging.debug(f"i: {i}, code: {code}")
+        logging.info(f"\nold: {program}\n"
+                        f"new: {processIntcode(program)}"
+                        )
 
 # processes intcode        
 def processIntcode(program):
-    try:
-        if program[0] == 1:
+    #initialize as first char
+    position = 0 
+
+    logging.debug("processing intcode...")
+    while program[position] != 99:
+        opcode = program[position]
+        pos1 = program[position + 1]
+        pos2 = program[position + 2]
+        output = program[position + 3]
+        
+        logging.debug(f"position: {position}")
+        logging.debug(f"opcode: {opcode}")
+        logging.debug(f"pos1: {pos1}")
+        logging.debug(f"pos2: {pos2}")
+        logging.debug(f"outp: {output}")
+
+        if opcode == 1:
             # add
-            pass
-        if program[0] == 2:
+            logging.debug("add")
+            program[output] = program[pos1] + program[pos2]
+            position = position + 4
+        if opcode == 2:
             # multiply
-            pass
-        if program[0] == 99:
-            # end 
-            pass
-    except Exception as e:
-        print("error: program must be a list of ints")
+            logging.debug("mult")
+            program[output] = program[pos1] * program[pos2]
+            position = position + 4
+
+    logging.debug("processing complete")
+    return program
+    
 
 if __name__ == '__main__':
     main()
