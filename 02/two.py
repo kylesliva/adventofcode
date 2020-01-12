@@ -6,12 +6,13 @@ import pytest
 
 #enable logging
 #logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s- %(message)s')
-logging.basicConfig(level=logging.INFO, format=' %(asctime)s - %(levelname)s- %(message)s')
+#logging.basicConfig(level=logging.INFO, format=' %(asctime)s - %(levelname)s- %(message)s')
 
 def main():
     programs = readFile(sys.argv[1])
     logging.debug(programs)
-    runCode(programs)
+    print(runCode(programs))
+
 
 # reads input file and returns string(s) of programs
 def readFile(path):
@@ -24,20 +25,26 @@ def readFile(path):
 
     # remove errant newline chars
     program = [line.rstrip('\n') for line in program]
-        
+
     return program
 
 # goes through all program strings
 def runCode(programs):
+    outputs = []
     for program in programs:
         logging.debug(f"program: {program}")
+
+        #splits str into array of one char strings
         program = program.split(',')
-        #yeah these need to be ints
+
+        #casts each char as int
         program = [int(stringInt) for stringInt in program]
         logging.debug(f"split program: {program}")
         logging.info(f"\nold: {program}\n"
                         f"new: {processIntcode(program)}"
                         )
+        outputs.append(program)
+    return outputs
 
 # processes intcode        
 def processIntcode(program):
@@ -71,6 +78,11 @@ def processIntcode(program):
     logging.debug("processing complete")
     return program
     
+# see how hard it is to put test cases in another file
+def testIntcode():
+    programs = readFile('test-strings.txt')
+
+    assert runCode(programs) == [[2, 0, 0, 0, 99], [2, 3, 0, 6, 99], [2, 4, 4, 5, 99, 9801], [30, 1, 1, 4, 2, 5, 6, 0, 99]]
 
 if __name__ == '__main__':
     main()
