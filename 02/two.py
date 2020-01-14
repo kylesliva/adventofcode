@@ -5,28 +5,24 @@ import sys
 import pytest
 
 #enable logging
-logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s- %(message)s')
+#logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s- %(message)s')
 #logging.basicConfig(level=logging.INFO, format=' %(asctime)s - %(levelname)s- %(message)s')
 
 def main():
-    programs = readFile(sys.argv[1])
-    logging.debug(f"program ints: {programs}")
-    print(runCode(programs, 12, 2)[0][0])
-
-    #for i in range(0,100):
-    #    for j in range(0,100):
-    #        runCode(programs, i, j)
-    output = 0
-    
-
-
-
+    test_program = readFile(sys.argv[1])[0]
+    logging.debug(f"test_program: {test_program}")
+    # this only didn't work because you didn't clean the memory
+    for noun in range(0,100):
+        for verb in range(0,100):
+            test_program = readFile(sys.argv[1])[0]
+            result = processIntcode(test_program, noun, verb)[0]
+            if result == 19690720:
+                print(f"result: {result}\nnoun: {noun} verb: {verb}\nans: {(100 * noun) + verb}")
 # reads input file and returns list(s) of ints
 def readFile(path):
     programs = []
 
     results = []
-    
     with open(path, 'r') as file:
         programs_string = file.readlines()
         logging.debug(programs_string)
@@ -50,40 +46,43 @@ def readFile(path):
 
     logging.info(type(results[0]))
 
-    # problem 1 logic
-    if path == "input.txt":
-        logging.info("main input detected")
-        logging.debug(results[0])
-        noun = 12
-        verb = 2
-        results[0] = changeVerbs(noun, verb, results[0])
-
     return results
 
-def changeVerbs(noun, verb, program):
-    program[1] = noun
-    program[2] = verb 
-
-    return program
-
-# runs intcode machine until desired result is found
-    
-def runCode(programs, noun, verb):
-    outputs = []
-    for program in programs:
-        program = changeVerbs(noun, verb, program)
-        logging.debug(program)
-        processIntcode(program)
-        outputs.append(program)
-
-    return outputs
-
-# processes intcode        
-def processIntcode(program):
+# processes intcode with inputs        
+# merci, https://stackabuse.com/overloading-functions-and-operators-in-python/
+def processIntcode(program, noun=None, verb=None):
     #initialize as first char
     position = 0 
+    logging.debug(f"program type: {type(program)}\n{program}")
 
-    print("processing intcode...")
+    if noun is not None and verb is not None:
+        program[1] = noun
+        program[2] = verb
+        while program[position] != 99:
+            opcode = program[position]
+            pos1 = program[position + 1]
+            pos2 = program[position + 2]
+            output = program[position + 3]
+            
+            logging.debug(f"position: {position}")
+            logging.debug(f"opcode: {opcode}")
+            logging.debug(f"pos1: {pos1}")
+            logging.debug(f"pos2: {pos2}")
+            logging.debug(f"outp: {output}")
+
+            if opcode == 1:
+                # add
+                logging.debug("add")
+                program[output] = program[pos1] + program[pos2]
+                position = position + 4
+            if opcode == 2:
+                # multiply
+                logging.debug("mult")
+                program[output] = program[pos1] * program[pos2]
+                position = position + 4
+
+        return program
+
     while program[position] != 99:
         opcode = program[position]
         pos1 = program[position + 1]
@@ -107,15 +106,17 @@ def processIntcode(program):
             program[output] = program[pos1] * program[pos2]
             position = position + 4
 
-    logging.debug("processing complete")
     return program
-    
+
+
 # see how hard it is to put test cases in another file
 # tests intcode compiler
 def testIntcode():
     programs = readFile('test-strings.txt')
 
-    assert runCode(programs) == [[2, 0, 0, 0, 99], [2, 3, 0, 6, 99], [2, 4, 4, 5, 99, 9801], [30, 1, 1, 4, 2, 5, 6, 0, 99]]
+    test_results = [processIntcode(program) for program in programs]
+
+    assert test_results == [[2, 0, 0, 0, 99], [2, 3, 0, 6, 99], [2, 4, 4, 5, 99, 9801], [30, 1, 1, 4, 2, 5, 6, 0, 99]]
 
 if __name__ == '__main__':
     main()
