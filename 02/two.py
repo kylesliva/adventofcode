@@ -12,6 +12,8 @@ def main():
     test_program = readFile(sys.argv[1])[0]
     logging.debug(f"test_program: {test_program}")
     # this only didn't work because you didn't clean the memory
+    # current solution does a lot of unecessary io, check and see if there's a
+    # way to clear memory without invoking readFile 99*99 times
     for noun in range(0,100):
         for verb in range(0,100):
             test_program = readFile(sys.argv[1])[0]
