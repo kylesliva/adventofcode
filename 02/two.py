@@ -3,6 +3,7 @@
 import logging
 import sys
 import pytest
+import copy as c
 
 #enable logging
 #logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s- %(message)s')
@@ -10,14 +11,18 @@ import pytest
 
 def main():
     test_program = readFile(sys.argv[1])[0]
+    loop_program = []
     logging.debug(f"test_program: {test_program}")
     # this only didn't work because you didn't clean the memory
     # current solution does a lot of unecessary io, check and see if there's a
     # way to clear memory without invoking readFile 99*99 times
+    # this may be faster
     for noun in range(0,100):
         for verb in range(0,100):
-            test_program = readFile(sys.argv[1])[0]
-            result = processIntcode(test_program, noun, verb)[0]
+            # this seems to be a better solution 
+            # see https://realpython.com/copying-python-objects/
+            loop_program = c.deepcopy(test_program)
+            result = processIntcode(loop_program, noun, verb)[0]
             if result == 3790645:
                 print(f"result: {result}\nnoun: {noun} verb: {verb}\nans: {(100 * noun) + verb}")
             if result == 19690720:
