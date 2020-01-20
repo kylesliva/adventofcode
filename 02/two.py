@@ -18,6 +18,8 @@ def main():
         for verb in range(0,100):
             test_program = readFile(sys.argv[1])[0]
             result = processIntcode(test_program, noun, verb)[0]
+            if result == 3790645:
+                print(f"result: {result}\nnoun: {noun} verb: {verb}\nans: {(100 * noun) + verb}")
             if result == 19690720:
                 print(f"result: {result}\nnoun: {noun} verb: {verb}\nans: {(100 * noun) + verb}")
 # reads input file and returns list(s) of ints
