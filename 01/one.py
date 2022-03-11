@@ -37,7 +37,7 @@ def readMass(path):
         masses = file.readlines()
     logging.debug(f"**** MASSES ****\n{p.pformat(masses)}")
 
-    return masses
+    return [int(mass.rstrip("\\n")) for mass in masses]
 
 # never used
 def testReadMass():
